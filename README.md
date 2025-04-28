@@ -2,6 +2,19 @@
 
 A modern, responsive chatbot web interface inspired by platforms like Claude and ChatGPT. This project provides a clean, user-friendly frontend that can be integrated with any language model backend.
 
+## Usage
+To start the chatbot, first make sure to download fastapi and uvicorn using following command:
+
+```
+pip install fastapi uvicorn
+```
+
+Then start the backend server using
+```
+uvicorn api_server:app --host 0.0.0.0 --port 8000 --reload
+```
+
+Lastly, start the frontend chat using liver server in vscode on ```index.html```
 ## Features
 
 - **Clean UI Design**: Modern interface with responsive layout for all devices

@@ -1,22 +1,11 @@
 document.addEventListener('DOMContentLoaded', function() {
+    userMessages = [];
     const chatMessages = document.getElementById('chat-messages');
     const userInput = document.getElementById('user-input');
     const sendButton = document.getElementById('send-button');
     const clearButton = document.querySelector('.action-button');
 
     // Sample bot responses to randomly choose from
-    const botResponses = [
-        "I'm here to help! What would you like to know?",
-        "That's an interesting question. Let me think about that.",
-        "I understand your query. Here's what I can tell you...",
-        "Thanks for sharing that with me. Would you like to know more?",
-        "I'm not sure I fully understand. Could you rephrase that?",
-        "Based on what you've told me, I'd recommend the following...",
-        "That's a great point! I hadn't considered that perspective.",
-        "I'm sorry, but I don't have enough information to answer that properly.",
-        "Let me clarify a few things about your question...",
-        "I've processed your request. Here's what I found."
-    ];
 
     // Format time for timestamp
     function formatTime() {
@@ -107,6 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const message = userInput.value.trim();
         if (message) {
             // Add user message
+            userMessages.push(message);
             addMessage(message, true);
 
             // Clear input field
@@ -119,15 +109,23 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Simulate bot "typing" with a delay
             setTimeout(() => {
-                // Remove typing indicator
-                chatMessages.removeChild(typingIndicator);
+                // // Remove typing indicator
+                // chatMessages.removeChild(typingIndicator);
 
-                // Get random bot response
-                const randomIndex = Math.floor(Math.random() * botResponses.length);
-                const botResponse = botResponses[randomIndex];
+                // // Get random bot response
+                // const randomIndex = Math.floor(Math.random() * botResponses.length);
+                // const botResponse = botResponses[randomIndex];
 
-                // Add bot response
-                addMessage(botResponse);
+                // // Add bot response
+                // addMessage(botResponse);
+                const fullText = userMessages.join(' ');
+                getMBTIPrediction(fullText).then(prediction => {
+                    // Remove typing indicator
+                    chatMessages.removeChild(typingIndicator);
+
+                    // Add bot response
+                    addMessage(prediction);
+                });
             }, 1500);
         }
     }
@@ -138,7 +136,9 @@ document.addEventListener('DOMContentLoaded', function() {
         while (chatMessages.children.length > 1) {
             chatMessages.removeChild(chatMessages.lastChild);
         }
-
+        
+        // Clear the saved user messages
+        userMessages = []; 
         // Update the timestamp of the first message
         const firstMessageFooter = chatMessages.querySelector('.message-footer');
         if (firstMessageFooter) {
@@ -147,6 +147,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 timestamp.textContent = formatTime();
             }
         }
+    }
+
+    async function getMBTIPrediction(text) {
+        const response = await fetch('http://localhost:8000/predict-mbti', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: text })
+        });
+        const data = await response.json();
+        return data.chatbot_response;
     }
 
     // Send button click event
